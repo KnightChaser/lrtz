@@ -12,6 +12,7 @@ import {
 
 import { DownloadForm } from "./DownloadForm";
 import { DownloadProgress } from "./DownloadProgress";
+import { ResultsPanel } from "./ResultsPanel";
 import { useDownload } from "./useDownload";
 
 export default function App() {
@@ -57,16 +58,15 @@ export default function App() {
             </Tabs.List>
 
             <Tabs.Panel value="results">
-              <Paper className="workspace-panel empty-panel">
+              <Paper className="workspace-panel">
                 <Text className="panel-kicker">MODULE 01</Text>
-                <Title order={2} mt="sm">
+                <Title order={2} mt="sm" mb="lg">
                   Results
                 </Title>
-                <Text c="dimmed" mt="sm">
-                  Backtest charts will appear here in a future update.
-                </Text>
+                <ResultsPanel />
               </Paper>
             </Tabs.Panel>
+
 
             <Tabs.Panel value="download">
               <Stack gap={18}>

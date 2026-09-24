@@ -10,6 +10,8 @@ from .api import router
 from .downloads import DownloadService
 from .upbit import UpbitClient
 
+from backend.results import router as results_router
+
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 DATA_DIR = PROJECT_ROOT / "data"
 RESULT_DIR = PROJECT_ROOT / "result"
@@ -34,3 +36,4 @@ async def lifespan(app: FastAPI) -> AsyncIterator[None]:
 
 app = FastAPI(title="lrtz", lifespan=lifespan)
 app.include_router(router)
+app.include_router(results_router)
