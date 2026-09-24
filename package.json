@@ -1,0 +1,13 @@
+{
+  "name": "lrtz-workspace",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently --kill-others --names api,web \"uv run uvicorn backend.main:app --host 127.0.0.1 --port 8000\" \"npm --prefix frontend run dev\"",
+    "build": "npm --prefix frontend run build",
+    "check:python": "uv run ruff check backend && uv run ruff format --check backend",
+    "format:python": "uv run ruff check --fix backend && uv run ruff format backend"
+  },
+  "devDependencies": {
+    "concurrently": "^10.0.5"
+  }
+}
