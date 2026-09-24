@@ -3,6 +3,7 @@ import type { FormEvent } from "react";
 import {
   Autocomplete,
   Button,
+  Group,
   Paper,
   Select,
   SimpleGrid,
@@ -81,20 +82,27 @@ export function DownloadForm({ busy, onStart }: Props) {
   const selected = markets.find((item) => item.market === market);
 
   return (
-    <Paper withBorder radius="md" p="xl">
-      <Stack gap="lg">
-        <div>
-          <Title order={3}>Historical candles</Title>
-          <Text c="dimmed" mt="xs">
-            Download complete Upbit candles to the project's data folder.
-          </Text>
-        </div>
+    <Paper className="workspace-panel" p={{ base: "lg", sm: "xl" }}>
+      <Stack gap="xl">
+        <Group justify="space-between" align="start" gap="md">
+          <div>
+            <Text className="panel-kicker">MODULE 02 / DATA INTAKE</Text>
+            <Title order={2} className="panel-title" mt={8}>
+              Historical candles
+            </Title>
+            <Text className="panel-description" mt="xs">
+              Retrieve complete Upbit OHLCV candles for local analysis.
+            </Text>
+          </div>
+
+          <Text className="panel-tag">UPBIT · PUBLIC API</Text>
+        </Group>
 
         <form onSubmit={(event) => void submit(event)}>
           <Stack gap="lg">
-            <SimpleGrid cols={{ base: 1, sm: 2 }}>
+            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
               <Autocomplete
-                label="Market"
+                label="MARKET"
                 value={market}
                 onChange={setMarket}
                 data={markets.map((item) => ({
@@ -103,7 +111,7 @@ export function DownloadForm({ busy, onStart }: Props) {
                 }))}
                 description={
                   marketError
-                    ? "Market list unavailable. Enter an Upbit market code."
+                    ? "Market list unavailable. Enter an Upbit code."
                     : selected
                       ? `${selected.name} · ${selected.market}`
                       : "Enter an Upbit market code."
@@ -114,7 +122,7 @@ export function DownloadForm({ busy, onStart }: Props) {
               />
 
               <Select
-                label="Interval"
+                label="INTERVAL"
                 data={intervals}
                 value={minutes}
                 onChange={(value) => setMinutes(value ?? "60")}
@@ -123,7 +131,7 @@ export function DownloadForm({ busy, onStart }: Props) {
               />
 
               <Select
-                label="Period"
+                label="PERIOD"
                 data={[
                   { value: "month", label: "Last 30 days" },
                   { value: "year", label: "Last year" },
@@ -137,18 +145,19 @@ export function DownloadForm({ busy, onStart }: Props) {
             </SimpleGrid>
 
             {period === "custom" && (
-              <SimpleGrid cols={{ base: 1, sm: 2 }}>
+              <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="lg">
                 <TextInput
                   type="datetime-local"
-                  label="Start — Korea Standard Time"
+                  label="START / KST"
                   value={start}
                   onChange={(event) => setStart(event.currentTarget.value)}
                   required
                   disabled={busy}
                 />
+
                 <TextInput
                   type="datetime-local"
-                  label="End — Korea Standard Time"
+                  label="END / KST"
                   value={end}
                   onChange={(event) => setEnd(event.currentTarget.value)}
                   required
@@ -157,14 +166,20 @@ export function DownloadForm({ busy, onStart }: Props) {
               </SimpleGrid>
             )}
 
-            <Text size="sm" c="dimmed">
-              Candles must start at or after Start and close at or before End.
-              Aggregated 2-hour candles use KST midnight boundaries.
-            </Text>
+            <div className="form-bottom">
+              <Text size="xs" c="dimmed" className="form-note">
+                Complete candles only. Two-hour intervals follow KST
+                midnight boundaries.
+              </Text>
 
-            <Button type="submit" loading={busy} style={{ alignSelf: "start" }}>
-              Download CSV
-            </Button>
+              <Button
+                type="submit"
+                loading={busy}
+                className="download-button"
+              >
+                {busy ? "ACQUIRING DATA" : "DOWNLOAD CSV  ↗"}
+              </Button>
+            </div>
           </Stack>
         </form>
       </Stack>

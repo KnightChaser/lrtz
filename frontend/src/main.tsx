@@ -8,14 +8,17 @@ import "./styles.css";
 import App from "./App";
 
 const theme = createTheme({
-  primaryColor: "blue",
-  defaultRadius: "md",
-  fontFamily: "Inter, system-ui, sans-serif",
+  fontFamily: '"Geist Mono", monospace',
+  headings: {
+    fontFamily: '"Geist Mono", monospace',
+  },
+  primaryColor: "cyan",
+  defaultRadius: "sm",
 });
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <MantineProvider theme={theme} defaultColorScheme="dark">
+    <MantineProvider theme={theme} forceColorScheme="dark">
       <App />
     </MantineProvider>
   </React.StrictMode>,

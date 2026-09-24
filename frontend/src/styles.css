@@ -1,9 +1,354 @@
+@import url("https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&display=swap");
+
+:root {
+  font-family: "Geist Mono", monospace;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+
+  --app-bg: #080d14;
+  --app-panel: #0e1722;
+  --app-panel-raised: #111d2a;
+  --app-line: #26384a;
+  --app-text: #e3edf5;
+  --app-muted: #8195a5;
+  --app-accent: #5ce1dd;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
-  margin: 0;
   min-width: 320px;
-  background: #0d1119;
+  margin: 0;
+  background: var(--app-bg);
+  color: var(--app-text);
+  font-family: "Geist Mono", monospace;
+  font-optical-sizing: auto;
+}
+
+button,
+input,
+select,
+textarea {
+  font-family: "Geist Mono", monospace;
+}
+
+.app-shell {
+  min-height: 100vh;
+  background:
+    radial-gradient(
+      ellipse 65% 32% at 78% -8%,
+      rgb(33 107 126 / 16%),
+      transparent 75%
+    ),
+    linear-gradient(
+      rgb(88 157 175 / 3%) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgb(88 157 175 / 3%) 1px,
+      transparent 1px
+    ),
+    var(--app-bg);
+  background-size: auto, 42px 42px, 42px 42px, auto;
+}
+
+.app-header {
+  padding: 12px 0 8px;
+}
+
+.eyebrow,
+.panel-kicker,
+.panel-tag,
+.header-status,
+.metric-label,
+.app-footer {
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.15em;
+}
+
+.eyebrow,
+.panel-kicker {
+  color: var(--app-accent);
+}
+
+.brand {
+  color: #f3f9fd;
+  font-size: clamp(31px, 5vw, 43px);
+  font-weight: 650;
+  letter-spacing: -0.08em;
+  line-height: 1;
+}
+
+.brand-dot {
+  color: var(--app-accent);
+}
+
+.brand-subtitle {
+  color: var(--app-muted);
+  font-size: 12px;
+}
+
+.header-status {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  color: #9caeb8;
+  white-space: nowrap;
+}
+
+.status-light,
+.state-pill-light {
+  display: inline-block;
+  width: 7px;
+  height: 7px;
+  flex: none;
+  border-radius: 50%;
+  background: var(--app-accent);
+  box-shadow: 0 0 12px rgb(92 225 221 / 65%);
+}
+
+.workspace-tab-list {
+  gap: 12px;
+  border-bottom: 1px solid var(--app-line);
+}
+
+.workspace-tab {
+  padding: 12px 15px 15px;
+  border: 0;
+  color: #90a5b4;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.workspace-tab:hover {
+  color: #e6f6f7;
+  background: rgb(92 225 221 / 5%);
+}
+
+.workspace-tab[data-active] {
+  color: var(--app-accent);
+  border-bottom: 2px solid var(--app-accent);
+}
+
+.workspace-panel {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--app-line);
+  border-radius: 9px;
+  background:
+    linear-gradient(
+      145deg,
+      rgb(25 52 67 / 28%),
+      transparent 42%
+    ),
+    var(--app-panel);
+  box-shadow: 0 12px 36px rgb(0 0 0 / 11%);
+}
+
+.workspace-panel::before {
+  position: absolute;
+  top: 0;
+  left: 22px;
+  width: 54px;
+  height: 1px;
+  background: var(--app-accent);
+  content: "";
+}
+
+.empty-panel {
+  min-height: 200px;
+  padding: 28px;
+}
+
+.panel-title {
+  color: var(--app-text);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+.panel-description {
+  color: var(--app-muted);
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.panel-tag {
+  padding: 8px 10px;
+  border: 1px solid #31505b;
+  border-radius: 4px;
+  background: rgb(92 225 221 / 6%);
+  color: #90d8d6;
+  white-space: nowrap;
+}
+
+.workspace-panel .mantine-InputWrapper-label {
+  margin-bottom: 8px;
+  color: #a7bdcb;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+}
+
+.workspace-panel .mantine-Input-input {
+  height: 43px;
+  border: 1px solid #2d4253;
+  border-radius: 5px;
+  background: #0a131e;
+  color: #e0edf4;
+  font-size: 12px;
+}
+
+.workspace-panel .mantine-Input-input:hover {
+  border-color: #477180;
+}
+
+.workspace-panel .mantine-Input-input:focus {
+  border-color: var(--app-accent);
+  box-shadow: 0 0 0 2px rgb(92 225 221 / 11%);
+}
+
+.workspace-panel .mantine-Input-input:disabled {
+  opacity: 0.67;
+}
+
+.workspace-panel .mantine-InputWrapper-description {
+  margin-top: 7px;
+  color: var(--app-muted);
+  font-size: 10px;
+}
+
+.form-bottom {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 20px;
+  padding-top: 12px;
+  border-top: 1px solid #223342;
+}
+
+.form-note {
+  max-width: 550px;
+  line-height: 1.8;
+}
+
+.download-button {
+  min-width: 172px;
+  height: 42px;
+  flex: none;
+  border: 1px solid #69e8e1;
+  border-radius: 5px;
+  background: #52cbc7;
+  color: #082027;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+.download-button:hover {
+  background: #81eeea;
+}
+
+.progress-panel {
+  background:
+    linear-gradient(100deg, rgb(30 79 89 / 16%), transparent 55%),
+    var(--app-panel);
+}
+
+.progress-panel h3 {
+  font-size: 19px;
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+.state-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  border: 1px solid #31505b;
+  border-radius: 4px;
+  color: #9adbd8;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+}
+
+.state-pill--failed {
+  border-color: #74434d;
+  color: #ff9faa;
+}
+
+.state-pill--failed .state-pill-light {
+  background: #ff7e91;
+  box-shadow: 0 0 10px rgb(255 126 145 / 45%);
+}
+
+.state-pill--idle .state-pill-light {
+  background: #8195a5;
+  box-shadow: none;
+}
+
+.metrics {
+  padding-bottom: 5px;
+}
+
+.metric-label {
+  color: #718b9b;
+}
+
+.metric-value {
+  margin-top: 4px;
+  color: #e0edf4;
+  font-size: 18px;
+  font-weight: 500;
 }
 
 .file-message {
   overflow-wrap: anywhere;
+  line-height: 1.7;
+}
+
+.file-link {
+  width: fit-content;
+  color: var(--app-accent);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.app-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  padding-top: 18px;
+  border-top: 1px solid #233341;
+  color: #627d8d;
+}
+
+@media (max-width: 640px) {
+  .header-status,
+  .panel-tag {
+    display: none;
+  }
+
+  .form-bottom {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .download-button {
+    width: 100%;
+  }
+
+  .app-footer {
+    flex-direction: column;
+    gap: 7px;
+  }
 }
