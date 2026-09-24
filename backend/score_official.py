@@ -53,7 +53,11 @@ def score_file(input_path: Path, output_path: Path, window: int = 2500) -> None:
         raise ValueError("input contains duplicate candle timestamps")
 
     records = [{**row, "time": row["time_utc"]} for row in rows]
-    model = LorentzianClassification(records, settings=Settings())
+    settings = Settings(
+        include_full_history=True,
+    )
+
+    model = LorentzianClassification(records, settings=settings)
 
     result_fields = [
         name for name in RESULT_FIELDNAMES if name not in OHLC_COLUMNS
