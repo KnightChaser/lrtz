@@ -146,6 +146,7 @@ vite.config.ts.timestamp-*
 
 # Data
 data
+result
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
