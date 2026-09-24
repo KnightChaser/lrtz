@@ -10,6 +10,7 @@ requires-python = ">=3.13"
 dependencies = [
     "fastapi>=0.141.1",
     "httpx>=0.28.1",
+    "lorentzian-classification",
     "uvicorn>=0.53.0",
 ]
 
@@ -24,3 +25,11 @@ build-backend = "uv_build"
 dev = [
     "ruff>=0.16.8",
 ]
+
+[tool.uv.workspace]
+members = [
+    "vendor/lorentzian-classification-main/ports/python",
+]
+
+[tool.uv.sources]
+lorentzian-classification = { workspace = true }
