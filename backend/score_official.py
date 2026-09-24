@@ -92,9 +92,10 @@ def main() -> None:
     parser.add_argument("--window", type=int, default=2500)
     args = parser.parse_args()
 
+    project_root = Path(__file__).resolve().parents[3]
     destination = (
         args.output
-        or Path("result") / f"{args.input.stem}_lc.csv"
+        or project_root / "result" / f"{args.input.stem}_lc.csv"
     )
     score_file(args.input, destination, window=args.window)
 
