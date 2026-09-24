@@ -8,9 +8,11 @@ import {
   createSeriesMarkers,
   type SeriesMarker,
   type UTCTimestamp,
+  type Time,
 } from "lightweight-charts";
 
 import "./ResultsPanel.css";
+import { attachBacktestOverlay, fetchBacktest, type BacktestData } from "./backtestOverlay";
 
 type ResultBar = {
   time: number;
@@ -63,7 +65,11 @@ async function getJson<T>(url: string, signal?: AbortSignal): Promise<T> {
   return response.json() as Promise<T>;
 }
 
-function ResultChart({ bars }: { bars: ResultBar[] }) {
+function ResultChart({ bars, backtest }: {
+  bars: ResultBar[];
+  backtest: BacktestData | null;
+}) {
+  const fitAllRef = useRef<() => void>(() => {});
   const containerRef = useRef<HTMLDivElement>(null);
   const [focused, setFocused] = useState<ResultBar | null>(
     bars.at(-1) ?? null
@@ -99,10 +105,10 @@ function ResultChart({ bars }: { bars: ResultBar[] }) {
         borderColor: "#29404c",
         timeVisible: true,
         secondsVisible: false,
-        tickMarkFormatter: (time) => formatKst(time as number),
+        tickMarkFormatter: (time: Time) => formatKst(time as number),
       },
       localization: {
-        timeFormatter: (time) => formatKst(time as number),
+        timeFormatter: (time: Time) => formatKst(time as number),
       },
     });
 
@@ -196,12 +202,20 @@ function ResultChart({ bars }: { bars: ResultBar[] }) {
       }
     );
 
-    createSeriesMarkers(candles, markers);
+    const removeOverlay = backtest
+      ? attachBacktestOverlay(chart, candles, container, bars.map((bar) => bar.time), backtest)
+      : undefined;
+    if (!backtest) {
+      createSeriesMarkers(candles, markers.map((marker) => ({
+        ...marker, text: `${marker.text} SIGNAL`,
+      })));
+    }
+    fitAllRef.current = () => chart.timeScale().fitContent();
 
     const byTime = new Map(bars.map((bar) => [bar.time, bar]));
 
     chart.subscribeCrosshairMove((event) => {
-      if (event.time === undefined) return;
+      if (event.time === undefined) { setFocused(bars.at(-1) ?? null); return; }
 
       const bar = byTime.get(Number(event.time));
       if (bar) setFocused(bar);
@@ -212,8 +226,12 @@ function ResultChart({ bars }: { bars: ResultBar[] }) {
       to: bars.length + 5,
     });
 
-    return () => chart.remove();
-  }, [bars]);
+    return () => {
+      fitAllRef.current = () => {};
+      removeOverlay?.();
+      chart.remove();
+    };
+  }, [bars, backtest]);
 
   return (
     <>
@@ -228,9 +246,9 @@ function ResultChart({ bars }: { bars: ResultBar[] }) {
             <span>Prediction {focused.prediction}</span>
             <span>Direction {focused.direction}</span>
             <span>Kernel {formatPrice(focused.kernel)}</span>
-            {focused.buy && <strong className="results-buy">BUY</strong>}
+            {focused.buy && <strong className="results-buy">BUY SIGNAL</strong>}
             {focused.sell && (
-              <strong className="results-sell">SELL</strong>
+              <strong className="results-sell">SELL SIGNAL</strong>
             )}
           </>
         ) : (
@@ -238,15 +256,28 @@ function ResultChart({ bars }: { bars: ResultBar[] }) {
         )}
       </div>
 
+      <Group justify="space-between" className="results-chart-toolbar">
+        <Text size="xs">{backtest
+          ? "PRICE / EXECUTIONS · PREDICTION · CUMULATIVE RETURN"
+          : "PRICE / SIGNALS · PREDICTION"}</Text>
+        <Button size="compact-xs" variant="subtle" onClick={() => fitAllRef.current()}>
+          Fit all candles
+        </Button>
+      </Group>
       <div className="results-chart" ref={containerRef} />
       <Text className="results-caption" size="xs">
-        Candles and kernel estimate above · Prediction below · Times in KST
+        {backtest
+          ? "Hover a SELL FILL marker for trade details. Return includes cash and open positions valued at each candle close. Times in KST."
+          : "Signal markers only. No matching baseline backtest. Times in KST."}
       </Text>
     </>
   );
 }
 
 export function ResultsPanel() {
+  const [backtest, setBacktest] = useState<BacktestData | null>(null);
+  const [backtestError, setBacktestError] = useState<string | null>(null);
+  const [revision, setRevision] = useState(0);
   const [files, setFiles] = useState<string[]>([]);
   const [selectedFile, setSelectedFile] = useState<string | null>(null);
   const [result, setResult] = useState<ResultResponse | null>(null);
@@ -258,6 +289,7 @@ export function ResultsPanel() {
       setError(null);
       const data = await getJson<{ files: string[] }>("/api/results");
       setFiles(data.files);
+      setRevision((value) => value + 1);
       setSelectedFile((current) =>
         current && data.files.includes(current)
           ? current
@@ -275,6 +307,7 @@ export function ResultsPanel() {
   useEffect(() => {
     if (!selectedFile) {
       setResult(null);
+      setBacktest(null);
       return;
     }
 
@@ -282,12 +315,22 @@ export function ResultsPanel() {
     setLoading(true);
     setError(null);
     setResult(null);
+    setBacktest(null);
+    setBacktestError(null);
 
-    void getJson<ResultResponse>(
-      `/api/results/${encodeURIComponent(selectedFile)}?limit=5000`,
+    void Promise.all([getJson<ResultResponse>(
+      `/api/results/${encodeURIComponent(selectedFile)}?limit=10000`,
       controller.signal
-    )
-      .then(setResult)
+    ), fetchBacktest(selectedFile, controller.signal).catch((cause: unknown) => {
+      if (!controller.signal.aborted) setBacktestError(String(cause));
+      return null;
+    })])
+      .then(([nextResult, nextBacktest]) => {
+        if (!controller.signal.aborted) {
+          setResult(nextResult);
+          setBacktest(nextBacktest);
+        }
+      })
       .catch((cause: unknown) => {
         if (!controller.signal.aborted) setError(String(cause));
       })
@@ -296,7 +339,7 @@ export function ResultsPanel() {
       });
 
     return () => controller.abort();
-  }, [selectedFile]);
+  }, [selectedFile, revision]);
 
   return (
     <section className="results-panel">
@@ -319,6 +362,7 @@ export function ResultsPanel() {
       {!loading && files.length === 0 && (
         <Text c="dimmed">No CSV files found in result/.</Text>
       )}
+      {backtestError && <Alert color="yellow" mb="md">{backtestError}</Alert>}
       {loading && <Text c="dimmed">Loading chart...</Text>}
 
       {result && result.bars.length > 0 && (
@@ -326,7 +370,15 @@ export function ResultsPanel() {
           <Text size="xs" c="dimmed" mb="sm">
             {result.filename} · {result.bars.length.toLocaleString()} candles
           </Text>
-          <ResultChart bars={result.bars} />
+          {backtest && (
+            <Group className="results-run-summary" gap="xl" mb="md">
+              <Text size="sm">Net return {Number(backtest.summary.return_pct).toFixed(2)}%</Text>
+              <Text size="sm">Closed trades {backtest.summary.completed_trades}</Text>
+              <Text size="xs">Fee {backtest.summary.fee_bps} bps / side</Text>
+              <Text size="xs">Slippage {backtest.summary.slippage_bps} bps / side</Text>
+            </Group>
+          )}
+          <ResultChart bars={result.bars} backtest={backtest} />
         </>
       )}
     </section>
