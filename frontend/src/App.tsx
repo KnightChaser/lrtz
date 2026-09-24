@@ -58,7 +58,7 @@ export default function App() {
             </Tabs.List>
 
             <Tabs.Panel value="results">
-              <Paper className="workspace-panel">
+              <Paper className="workspace-panel results-panel-shell">
                 <Text className="panel-kicker">MODULE 01</Text>
                 <Title order={2} mt="sm" mb="lg">
                   Results
