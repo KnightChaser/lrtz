@@ -213,6 +213,8 @@ def main():
         args.slippage_bps,
     )
 
+    summary["source_csv"] = args.input.name
+
     args.output_dir.mkdir(parents=True, exist_ok=True)
 
     write_csv(

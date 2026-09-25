@@ -29,8 +29,7 @@
 
 .results-chart {
   width: 100%;
-  height: 960px;
-  position: relative;
+  height: 680px;
   border: 1px solid #29404c;
 }
 
@@ -41,30 +40,30 @@
 
 @media (max-width: 700px) {
   .results-chart {
-    height: 800px;
+    height: 520px;
   }
 }
-.results-chart-toolbar {
-  padding: 8px 12px;
-  border: 1px solid #29404c;
-  border-bottom: 0;
-  color: #a4b9c8;
-}
-.results-run-summary { color: #b5d8dc; }
-.trade-tooltip {
-  position: absolute;
-  z-index: 10;
-  max-width: calc(100% - 16px);
+.results-strategies {
   padding: 14px 16px;
-  border: 1px solid #34505a;
-  border-radius: 6px;
-  background: #0c1824f5;
-  color: #dce8ed;
-  box-shadow: 0 12px 30px #0008;
-  font: 12px/1.8 "Geist Mono", monospace;
-  white-space: pre-wrap;
+  margin-bottom: 14px;
+  border: 1px solid #29404c;
+  background: #101923;
+}
+.results-chart-wrap { position: relative; }
+.results-chart { height: 960px; }
+.results-trade-tooltip {
+  position: absolute;
+  right: 22px;
+  top: 20px;
+  z-index: 2;
+  max-width: min(480px, calc(100% - 44px));
+  padding: 12px 16px;
+  border: 1px solid #4d7886;
+  background: #101923ef;
+  color: #d6e6ed;
+  font-size: 12px;
   pointer-events: none;
 }
-.trade-tooltip[data-outcome="profit"] { border-color: #67dbd0; }
-.trade-tooltip[data-outcome="loss"] { border-color: #ff7888; }
-.trade-tooltip[hidden] { display: none; }
+.results-trade-tooltip div { display: grid; gap: 5px; }
+.results-trade-tooltip div + div { margin-top: 12px; padding-top: 12px; border-top: 1px solid #29404c; }
+@media (max-width: 700px) { .results-chart { height: 780px; } }
