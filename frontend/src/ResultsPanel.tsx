@@ -295,8 +295,12 @@ export function ResultsPanel() {
             label={`${info.name} · ${info.returnPct.toFixed(2)}% · ${info.completedTrades} trades`}
             color="cyan" checked={enabled.includes(info.id)}
             styles={{ label: { color: COLORS[index % COLORS.length] } }}
-            onChange={(event) => setEnabled((current) => event.currentTarget.checked
-              ? [...current, info.id] : current.filter((id) => id !== info.id))} />)}
+            onChange={(event) => {
+              const checked = event.currentTarget.checked;
+              setEnabled((current) => checked
+                ? [...new Set([...current, info.id])]
+                : current.filter((id) => id !== info.id));
+            }} />)}
         </Group> : <Text c="dimmed" size="xs" mt="xs">No matching backtests. Add backtest/&lt;strategy&gt;/ files.</Text>}
         {infos.length > 0 && <Text c="dimmed" size="xs" mt="xs">
           Returns include each strategy's configured fees and slippage; hover an exit candle for net trade details.
