@@ -7,6 +7,13 @@
   max-width: 640px;
 }
 
+.results-strategies {
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  border: 1px solid #29404c;
+  background: #101923;
+}
+
 .results-readout {
   display: flex;
   flex-wrap: wrap;
@@ -19,38 +26,16 @@
   font-size: 12px;
 }
 
-.results-buy {
-  color: #67e1ce;
-}
-
-.results-sell {
-  color: #ff8490;
+.results-chart-wrap {
+  position: relative;
 }
 
 .results-chart {
   width: 100%;
-  height: 680px;
+  height: 960px;
   border: 1px solid #29404c;
 }
 
-.results-caption {
-  padding-top: 10px;
-  color: #8299a7;
-}
-
-@media (max-width: 700px) {
-  .results-chart {
-    height: 520px;
-  }
-}
-.results-strategies {
-  padding: 14px 16px;
-  margin-bottom: 14px;
-  border: 1px solid #29404c;
-  background: #101923;
-}
-.results-chart-wrap { position: relative; }
-.results-chart { height: 960px; }
 .results-trade-tooltip {
   position: absolute;
   right: 22px;
@@ -64,6 +49,25 @@
   font-size: 12px;
   pointer-events: none;
 }
-.results-trade-tooltip div { display: grid; gap: 5px; }
-.results-trade-tooltip div + div { margin-top: 12px; padding-top: 12px; border-top: 1px solid #29404c; }
-@media (max-width: 700px) { .results-chart { height: 780px; } }
+
+.results-trade-tooltip div {
+  display: grid;
+  gap: 5px;
+}
+
+.results-trade-tooltip div + div {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #29404c;
+}
+
+.results-caption {
+  padding-top: 10px;
+  color: #8299a7;
+}
+
+@media (max-width: 700px) {
+  .results-chart {
+    height: 780px;
+  }
+}

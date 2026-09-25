@@ -12,6 +12,7 @@ UNIT = Decimal("0.00000001")
 
 
 def parse_args():
+    """Read the input CSV, execution costs, and output location."""
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("input", type=Path, help="Verified score CSV")
     parser.add_argument(
@@ -31,6 +32,7 @@ def parse_args():
 
 
 def write_csv(path, rows, fields):
+    """Write one strategy output with a stable CSV column order."""
     with path.open("w", newline="", encoding="utf-8") as stream:
         writer = csv.DictWriter(stream, fieldnames=fields)
         writer.writeheader()
@@ -38,6 +40,7 @@ def write_csv(path, rows, fields):
 
 
 def backtest(rows, starting_cash, fee_bps, slippage_bps):
+    """Execute confirmed signals at the next candle open, long only."""
     fee_rate = fee_bps / Decimal("10000")
     slip_rate = slippage_bps / Decimal("10000")
 
@@ -57,6 +60,7 @@ def backtest(rows, starting_cash, fee_bps, slippage_bps):
             previous = rows[index - 1]
 
             if quantity > 0 and previous["Sell"] == "1":
+                # Selling below the open models adverse price movement.
                 price = Decimal(row["open"]) * (1 - slip_rate)
                 gross = quantity * price
                 fee = gross * fee_rate
@@ -86,8 +90,11 @@ def backtest(rows, starting_cash, fee_bps, slippage_bps):
                 entry = None
 
             elif quantity == 0 and previous["Buy"] == "1":
+                # Buying above the open models adverse price movement.
                 price = Decimal(row["open"]) * (1 + slip_rate)
                 equity_before = cash
+                # Reserve quote currency for both the fill price and fee.
+                # Round down the base quantity so the order never overspends.
                 quantity = (
                     cash / (price * (1 + fee_rate))
                 ).quantize(UNIT, rounding=ROUND_DOWN)
@@ -115,6 +122,7 @@ def backtest(rows, starting_cash, fee_bps, slippage_bps):
                         "cash_after": str(cash),
                     })
 
+        # Include unrealized position value in the equity curve.
         value = cash + quantity * Decimal(row["close"])
         peak = max(peak, value)
         drawdown = (value / peak - 1) * 100
@@ -153,6 +161,7 @@ def backtest(rows, starting_cash, fee_bps, slippage_bps):
 
 
 def main():
+    """Validate input, run the backtest, and write reusable artifacts."""
     args = parse_args()
 
     if args.cash <= 0 or args.fee_bps < 0 or args.slippage_bps < 0:
